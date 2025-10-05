@@ -220,9 +220,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      border-width: 2px;
-      border-style: dashed;
-      border-color: #d1d5db; /* gray-300 */
+      border-width: 0px; /* Removed border */
+      border-style: none; /* Removed border */
+      border-color: transparent; /* Removed border */
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
       transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
       transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -233,7 +233,7 @@
       margin-right: auto;
     }
     #photo-drop-zone:hover {
-      border-color: #9ca3af; /* hover:border-gray-400 */
+      border-color: transparent; /* Removed hover border */
     }
     #photo-preview-section {
       display: none;
@@ -290,6 +290,25 @@
     #logo.visible {
       opacity: 1;
     }
+    .upload-button {
+        font-family: sans-serif; /* Sans-serif font */
+        color: black; /* Black text */
+        background-color: transparent; /* Removed greyish background */
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        animation: pulsate 2s infinite ease-in-out; /* Slow pulsation: 2s duration */
+        display: inline-block;
+        font-weight: bold; /* Bold text */
+        font-size: 32px; /* Twice the size (assumed base 16px) */
+        text-align: center; /* Center text */
+    }
+    @keyframes pulsate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); } /* Slight grow */
+        100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -303,8 +322,7 @@
             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
           </svg>
         </div>
-        <div class="text-gray-700 text-sm font-medium">Click or drop photo here to start</div>
-        <div class="text-gray-500 text-xs mt-1">Get started with Stylo</div>
+        <button class="upload-button">Upload Photo</button>
       </div>
       <div id="photo-preview-section">
         <img id="preview-thumbnail" alt="Preview">
@@ -397,10 +415,10 @@
       photoDropZone.style.display = 'none';
       photoPreviewSection.style.display = 'block';
       referenceStatus.textContent = 'Generating reference... (30-60 seconds)';
-   
+  
       // Immediately transition to chat page with loading in image area
       startChatWithReference();
-   
+  
       try {
         const formData = new FormData();
         formData.append('file', uploadedPhotoFile);
@@ -413,7 +431,7 @@
         }
         const data = await response.json();
         userReferenceImage = data.reference_image;
-   
+  
         // Update image when done
         const outfitImage = document.getElementById('outfit-image');
         outfitImage.src = `https://stylo-ai.onrender.com/api/image/${userReferenceImage}`;
