@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taylor</title>
+  <title>Chat with Stylo</title>
   <link rel="icon" href="Images/favicon.png" type="image/png">
   <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -209,7 +209,7 @@
       word-wrap: break-word;
       margin-left: 10px;
     }
-    /* Photo drop zone */
+    /* Updated photo drop zone to match first file's pill format */
     #photo-drop-zone {
       background-color: #ffffff;
       border-radius: 9999px; /* rounded-full */
@@ -290,220 +290,13 @@
     #logo.visible {
       opacity: 1;
     }
-    /* From first file: Modal/Popup for showing collected products */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-   
-    .modal-overlay.active {
-      display: flex;
-    }
-   
-    .modal-content {
-      background-color: #ffffff;
-      border-radius: 16px;
-      padding: 30px;
-      max-width: 700px;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      position: relative;
-    }
-   
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #245248;
-      padding-bottom: 15px;
-    }
-   
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 28px;
-      cursor: pointer;
-      color: #888;
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-   
-    .modal-close:hover {
-      color: #333;
-    }
-   
-    .product-item {
-      display: flex;
-      align-items: center;
-      padding: 15px;
-      margin-bottom: 15px;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      transition: box-shadow 0.3s;
-    }
-   
-    .product-item:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-   
-    .product-thumbnail {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-right: 15px;
-    }
-   
-    .product-details {
-      flex-grow: 1;
-    }
-   
-    .product-brand {
-      font-weight: 600;
-      color: #245248;
-      margin-bottom: 5px;
-    }
-   
-    .product-link-btn {
-      background-color: #245248;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 14px;
-      transition: background-color 0.3s;
-      display: inline-block;
-    }
-   
-    .product-link-btn:hover {
-      background-color: #1e3d2f;
-    }
-   
-    .done-button {
-      position: fixed;
-      bottom: 90px;
-      right: 30px;
-      background: linear-gradient(135deg, #245248, #3a7254);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 50px;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(36, 82, 72, 0.3);
-      transition: all 0.3s;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-   
-    .done-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(36, 82, 72, 0.4);
-    }
-   
-    .done-button.hidden {
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <!-- Firebase Authentication Protection -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyDNs9nRygrXR0MaYosEYQeKxcpJHFgVzKo",
-      authDomain: "taylor-2680b.firebaseapp.com",
-      projectId: "taylor-2680b",
-      storageBucket: "taylor-2680b.firebasestorage.app",
-      messagingSenderId: "451921468175",
-      appId: "1:451921468175:web:6fa08eeae41caa6da1bc7a"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    // Global reference image
-    window.userReferenceImage = null;
-    // Protect this page
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        console.log('⚠️ No user authenticated, redirecting...');
-        window.location.href = 'index.html';
-      } else {
-        console.log('✅ User authenticated:', user.email);
-       
-        // Load user's profile image
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-         
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-           
-            // Use reference image filename
-            if (userData.referenceImageFilename) {
-              window.userReferenceImage = userData.referenceImageFilename;
-             
-              // Display reference image
-              const outfitImage = document.getElementById('outfit-image');
-              outfitImage.src = `https://stylo-ai.onrender.com/api/image/${userData.referenceImageFilename}`;
-              outfitImage.style.display = 'block';
-              document.getElementById('photo-drop-zone').style.display = 'none';
-              document.getElementById('photo-preview-section').style.display = 'none';
-              startChatWithReference(); // Show chat interface
-             
-              console.log('📸 User reference image loaded:', userData.referenceImageFilename);
-            } else {
-              // Show drop zone if no reference
-              document.getElementById('photo-drop-zone').style.display = 'flex';
-            }
-          }
-        } catch (error) {
-          console.error('Error loading user profile:', error);
-        }
-      }
-    });
-    // Logout function
-    window.logout = () => {
-      signOut(auth).then(() => {
-        console.log('✅ User logged out');
-        window.location.href = 'index.html';
-      }).catch((error) => {
-        console.error('❌ Logout error:', error);
-      });
-    };
-  </script>
-  <!-- Logout Button (Top Right) -->
-  <div class="fixed top-6 right-6 z-50">
-    <button onclick="logout()" class="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition shadow-lg flex items-center space-x-2">
-      <span>Logout</span>
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-      </svg>
-    </button>
-  </div>
   <div id="app-container">
     <div class="chat-container">
       <img id="logo" src="ben.png" alt="Logo">
-      <!-- Photo upload -->
+      <!-- Updated photo upload to pill format -->
       <div id="photo-drop-zone">
         <div class="flex items-center space-x-2 text-gray-600 mb-2">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -535,29 +328,8 @@
       </div>
     </div>
   </div>
-  <!-- Done Button -->
-  <button id="done-btn" class="done-button hidden">
-    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-    </svg>
-    View Items
-  </button>
-  <!-- Modal/Popup for showing collected products -->
-  <div id="products-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 style="margin: 0; color: #245248;">Your Shopping List</h2>
-        <button class="modal-close" onclick="closeProductsModal()">&times;</button>
-      </div>
-      <div id="products-list">
-        <!-- Products will be inserted here -->
-      </div>
-    </div>
-  </div>
   <input type="file" id="photo-input" accept="image/*" style="display: none;">
   <script>
-    // Track all collected products
-    let collectedProducts = [];
     // Fade in logo on load
     window.addEventListener('load', () => {
       const logo = document.getElementById('logo');
@@ -566,6 +338,7 @@
       }, 100); // Slight delay for smooth start
     });
     let isFirstMessage = true;
+    let userReferenceImage = null;
     let uploadedPhotoFile = null;
     const imageFrame = document.getElementById('image-frame');
     const bubble = document.getElementById('bubble');
@@ -590,7 +363,7 @@
       posX = Math.min(posX, imageFrame.clientWidth - bubbleSize);
       posY = Math.min(posY, imageFrame.clientHeight - bubbleSize);
     });
-    // Photo upload handling
+    // Photo upload from first
     const photoInput = document.getElementById('photo-input');
     const photoDropZone = document.getElementById('photo-drop-zone');
     const photoPreviewSection = document.getElementById('photo-preview-section');
@@ -624,10 +397,10 @@
       photoDropZone.style.display = 'none';
       photoPreviewSection.style.display = 'block';
       referenceStatus.textContent = 'Generating reference... (30-60 seconds)';
-  
-      // Transition to chat with loading
+   
+      // Immediately transition to chat page with loading in image area
       startChatWithReference();
-  
+   
       try {
         const formData = new FormData();
         formData.append('file', uploadedPhotoFile);
@@ -639,30 +412,25 @@
           throw new Error(`API returned ${response.status}`);
         }
         const data = await response.json();
-        window.userReferenceImage = data.reference_image;
-  
-        // Save to Firestore
-        const user = getAuth().currentUser;
-        if (user) {
-          await setDoc(doc(db, "users", user.uid), {
-            referenceImageFilename: data.reference_image
-          }, { merge: true });
-        }
-  
-        // Update image
+        userReferenceImage = data.reference_image;
+   
+        // Update image when done
         const outfitImage = document.getElementById('outfit-image');
-        outfitImage.src = `https://stylo-ai.onrender.com/api/image/${window.userReferenceImage}`;
+        outfitImage.src = `https://stylo-ai.onrender.com/api/image/${userReferenceImage}`;
         outfitImage.style.display = 'block';
         document.getElementById('loading').style.display = 'none';
         bubble.style.display = 'none';
-        photoPreviewSection.style.display = 'none';
       } catch (error) {
-        showChatError(`Error generating reference: ${error.message}`);
+        // Show error in chat
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div class="message donna-message"><div>❌ Error generating reference: ${error.message}</div></div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
         document.getElementById('loading').style.display = 'none';
         bubble.style.display = 'none';
       }
     }
     function startChatWithReference() {
+      photoPreviewSection.style.display = 'none';
       document.getElementById('chat-input-bar').style.display = 'flex';
       document.getElementById('chat-box').style.display = 'block';
       document.querySelector('.chat-container').style.flex = '0 0 60%';
@@ -671,15 +439,10 @@
       document.getElementById('loading').textContent = 'Generating reference image...';
       document.getElementById('loading').style.display = 'block';
       bubble.style.display = 'block';
-      // Hide logo
+      // Hide logo on transition to chat and image view
       document.getElementById('logo').style.display = 'none';
-      // Add welcome message
-      const chatBox = document.getElementById("chat-box");
-      const welcome = marked.parse('Ready to shop? Ask me anything about outfits and fashion!');
-      chatBox.innerHTML += `<div class="message donna-message"><div>${welcome}</div></div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
-    // Send message function with product collection
+    // Merged sendMessage with typing, outfit gen
     async function sendMessage() {
       const userInputField = document.getElementById("user-input");
       const userInput = userInputField.value.trim();
@@ -695,24 +458,21 @@
         bubble.style.display = 'block';
         isFirstMessage = false;
       }
-      // Typing indicator
+      // Typing indicator from first
       const typingIndicator = `<div class="message donna-message"><div class="typing-bubble"><span></span><span></span><span></span></div></div>`;
       chatBox.innerHTML += typingIndicator;
       chatBox.scrollTop = chatBox.scrollHeight;
       try {
         let response;
-        if (window.userReferenceImage) {
+        if (userReferenceImage) {
+          // Use generate-outfit from first
           response = await fetch("https://stylo-ai.onrender.com/api/generate-outfit", {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              prompt: userInput, 
-              max_results: 2,
-              reference_image: window.userReferenceImage 
-            })
+            body: JSON.stringify({ prompt: userInput, reference_image: userReferenceImage })
           });
         } else {
-          // Fallback if no reference
+          // Fallback to second's /chat
           response = await fetch("https://stylo-ai.onrender.com/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -722,96 +482,25 @@
         const data = await response.json();
         // Remove typing
         chatBox.lastChild.remove();
-        const formattedResponse = marked.parse(data.response || '✨ I\'ve generated your outfit! Check it out on the right →');
+        const formattedResponse = marked.parse(data.response || 'Outfit generated!');
         chatBox.innerHTML += `<div class="message donna-message"><div>${formattedResponse}</div></div>`;
-        // Collect products
-        if (data.products && data.products.length > 0) {
-          data.products.forEach(product => {
-            const exists = collectedProducts.some(p => p.product_link === product.product_link);
-            if (!exists) {
-              collectedProducts.push({
-                brand: product.brand,
-                image_url: product.image_url,
-                product_link: product.product_link,
-                query: userInput
-              });
-            }
-          });
-          console.log('🛍️ Total collected products:', collectedProducts.length);
-          if (collectedProducts.length > 0) {
-            document.getElementById('done-btn').classList.remove('hidden');
-          }
-        }
-        // Update image
         if (data.generated_images?.[0] || data.image_url) {
           const outfitImage = document.getElementById('outfit-image');
           outfitImage.src = data.generated_images ? `https://stylo-ai.onrender.com/api/image/${data.generated_images[0]}` : data.image_url;
           outfitImage.style.display = 'block';
           document.getElementById('loading').style.display = 'none';
           bubble.style.display = 'none';
-          if (data.latest_image) window.userReferenceImage = data.latest_image;
+          if (data.latest_image) userReferenceImage = data.latest_image;
         }
         chatBox.scrollTop = chatBox.scrollHeight;
       } catch (error) {
         chatBox.lastChild.remove();
-        showChatError(`Error: ${error.message}`);
+        chatBox.innerHTML += `<div class="message donna-message"><div>Error: ${error.message}</div></div>`;
         document.getElementById('loading').style.display = 'none';
         bubble.style.display = 'none';
         chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
-    function showChatError(errorMsg) {
-      const chatBox = document.getElementById("chat-box");
-      const formattedError = marked.parse(`❌ ${errorMsg}`);
-      chatBox.innerHTML += `<div class="message donna-message"><div>${formattedError}</div></div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-    // Done button functionality
-    document.getElementById('done-btn').addEventListener('click', function() {
-      showProductsModal();
-    });
-   
-    function showProductsModal() {
-      const modal = document.getElementById('products-modal');
-      const productsList = document.getElementById('products-list');
-     
-      // Clear previous content
-      productsList.innerHTML = '';
-     
-      if (collectedProducts.length === 0) {
-        productsList.innerHTML = '<p style="text-align: center; color: #888;">No products collected yet. Start chatting to find items!</p>';
-      } else {
-        collectedProducts.forEach((product, index) => {
-          const productItem = document.createElement('div');
-          productItem.className = 'product-item';
-          productItem.innerHTML = `
-            <img src="${product.image_url}" alt="${product.brand}" class="product-thumbnail">
-            <div class="product-details">
-              <div class="product-brand">${product.brand}</div>
-              <div style="color: #666; font-size: 14px; margin-bottom: 8px;">From: "${product.query}"</div>
-              <a href="${product.product_link}" target="_blank" class="product-link-btn">
-                View Product →
-              </a>
-            </div>
-          `;
-          productsList.appendChild(productItem);
-        });
-      }
-     
-      modal.classList.add('active');
-    }
-   
-    function closeProductsModal() {
-      const modal = document.getElementById('products-modal');
-      modal.classList.remove('active');
-    }
-   
-    // Close modal when clicking outside
-    document.getElementById('products-modal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeProductsModal();
-      }
-    });
     document.getElementById("user-input").addEventListener("keypress", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
